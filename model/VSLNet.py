@@ -70,7 +70,10 @@ class VSLNet(nn.Module):
         self.cq_attention = CQAttention(dim=configs.dim, drop_rate=configs.drop_rate)
         self.cq_concat = CQConcatenate(dim=configs.dim)
         # query-guided highlighting
-        self.highlight_layer = HighLightLayer(dim=configs.dim)
+        if(configs.model_name == "vslnet"):
+            self.highlight_layer = HighLightLayer(dim=configs.dim)
+        else:
+            self.highlight_layer = None
         # conditioned predictor
         self.predictor = ConditionedPredictor(
             dim=configs.dim,
@@ -127,10 +130,17 @@ class VSLNet(nn.Module):
         video_features = self.feature_encoder(video_features, mask=v_mask)
         features = self.cq_attention(video_features, query_features, v_mask, q_mask)
         features = self.cq_concat(features, query_features, q_mask)
-        h_score = self.highlight_layer(features, v_mask)
-        features = features * h_score.unsqueeze(2)
-        start_logits, end_logits = self.predictor(features, mask=v_mask)
+        # highlight only for vslnet
+        if self.highlight_layer is not None:
+            h_score = self.highlight_layer(fused, v_mask)
+            fused = fused * h_score.unsqueeze(2)
+        else:
+            h_score = None
+
+        
+        start_logits, end_logits = self.predictor(fused, mask=v_mask)
         return h_score, start_logits, end_logits
+
 
     def extract_index(self, start_logits, end_logits):
         return self.predictor.extract_index(
