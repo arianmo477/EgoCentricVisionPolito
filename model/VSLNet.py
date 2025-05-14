@@ -130,16 +130,15 @@ class VSLNet(nn.Module):
         video_features = self.feature_encoder(video_features, mask=v_mask)
         features = self.cq_attention(video_features, query_features, v_mask, q_mask)
         features = self.cq_concat(features, query_features, q_mask)
-        # highlight only for vslnet
-        if self.highlight_layer is not None:
-            h_score = self.highlight_layer(fused, v_mask)
-            fused = fused * h_score.unsqueeze(2)
+        # highlight layer
+        if not self.configs.VSLBase:
+            h_score = self.highlight_layer(features, v_mask)
+            features = features * h_score.unsqueeze(2)
+            start_logits, end_logits = self.predictor(features, mask=v_mask)
+            return h_score, start_logits, end_logits
         else:
-            h_score = None
-
-        
-        start_logits, end_logits = self.predictor(fused, mask=v_mask)
-        return h_score, start_logits, end_logits
+            start_logits, end_logits = self.predictor(features, mask=v_mask)
+            return 0, start_logits, end_logits
 
 
     def extract_index(self, start_logits, end_logits):
