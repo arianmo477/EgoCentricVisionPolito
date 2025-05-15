@@ -147,9 +147,10 @@ class VSLNet(nn.Module):
         )
 
     def compute_highlight_loss(self, scores, labels, mask):
-        return self.highlight_layer.compute_loss(
-            scores=scores, labels=labels, mask=mask
-        )
+        # if no highlight_layer, return zero on same device as mask
+        if self.highlight_layer is None:
+            return torch.tensor(0.0, device=mask.device)
+        return self.highlight_layer.compute_loss(scores, labels, mask)
 
     def compute_loss(self, start_logits, end_logits, start_labels, end_labels):
         return self.predictor.compute_cross_entropy_loss(
