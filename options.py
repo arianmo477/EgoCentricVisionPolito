@@ -45,6 +45,16 @@ def read_command_line():
         default=0,
         help="Number of CPU workers for the dataloader",
     )
+
+    #adding this arguemnet for enabling or disabling VSLNET by default it is VSLNET
+    parser.add_argument(
+      "--VSLBASE",
+      dest="VSLBASE",
+      action="store_true",
+      default=False,
+      help="Use VSLBase with Query-Guided Highlighting (QGH)",
+    )
+    
     # model parameters
     parser.add_argument("--word_size", type=int, default=None, help="number of words")
     parser.add_argument(
