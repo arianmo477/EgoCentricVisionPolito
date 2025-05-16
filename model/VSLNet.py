@@ -69,11 +69,9 @@ class VSLNet(nn.Module):
         # video and query fusion
         self.cq_attention = CQAttention(dim=configs.dim, drop_rate=configs.drop_rate)
         self.cq_concat = CQConcatenate(dim=configs.dim)
-        # query-guided highlighting
-        if(configs.model_name == "vslnet"):
+        # QGH is only used if configs.VSLBASE is false
+        if not configs.VSLBASE:
             self.highlight_layer = HighLightLayer(dim=configs.dim)
-        else:
-            self.highlight_layer = None
         # conditioned predictor
         self.predictor = ConditionedPredictor(
             dim=configs.dim,
@@ -131,14 +129,14 @@ class VSLNet(nn.Module):
         features = self.cq_attention(video_features, query_features, v_mask, q_mask)
         features = self.cq_concat(features, query_features, q_mask)
         # highlight layer
-        if not self.configs.VSLBase:
+        if not self.configs.VSLBASE:
             h_score = self.highlight_layer(features, v_mask)
             features = features * h_score.unsqueeze(2)
-            start_logits, end_logits = self.predictor(features, mask=v_mask)
-            return h_score, start_logits, end_logits
         else:
-            start_logits, end_logits = self.predictor(features, mask=v_mask)
-            return 0, start_logits, end_logits
+            h_score = torch.ones(features.size(0), features.size(1), device=features.device)
+
+        start_logits, end_logits = self.predictor(features, mask=v_mask)
+        return h_score, start_logits, end_logits
 
 
     def extract_index(self, start_logits, end_logits):
@@ -148,9 +146,10 @@ class VSLNet(nn.Module):
 
     def compute_highlight_loss(self, scores, labels, mask):
         # if no highlight_layer, return zero on same device as mask
-        if self.highlight_layer is None:
-            return torch.tensor(0.0, device=mask.device)
-        return self.highlight_layer.compute_loss(scores, labels, mask)
+        if not self.configs.VSLBASE:
+            return self.highlight_layer.compute_loss(scores=scores, labels=labels, mask=mask)
+        else:
+            return torch.tensor(0.0, device=scores.device)  # No loss when not using QGH
 
     def compute_loss(self, start_logits, end_logits, start_labels, end_labels):
         return self.predictor.compute_cross_entropy_loss(
