@@ -1,34 +1,21 @@
-# From Moments to Meanings: Egocentric Temporal Localization and Answer Generation with VSLNet and Video-LLaVA on Ego4D
-
-This repository implements a modular pipeline for **egocentric temporal localization** and **vision-language answer generation** using the **Ego4D NLQ dataset**. We benchmark span-based models like **VSLNet/VSLBase** for query-based video segment retrieval, and extend this with **Video-LLaVA-7B** for free-form answer generation based on the localized segments.
-
----
-
-## 🧠 Project Highlights
-
-- 📍 Benchmarks 8 span-localization configurations:
-  - Models: `VSLNet` vs `VSLBase`
-  - Text encoders: `BERT` vs `GloVe`
-  - Video encoders: `EgoVLP` vs `Omnivore`
-- 📦 Generates natural language answers from top localized segments using:
-  - `Video-LLaVA-7B`
-  - Commercial comparisons: `Gemini 1.5/2.5`, `GPT-4o`
-- 📊 Evaluation metrics:
-  - Temporal: `Rank@1@0.3/0.5`, `mIoU`
-  - Language: `BLEU`, `ROUGE`, `BERTScore`
-
----
----
-
-## 📦 Datasets and Features
-
-This project uses the [Ego4D Natural Language Queries](https://ego4d-data.org/tasks/natural-language-queries/) (NLQ) benchmark:
-
-- 💡 Video features:
-  - `Omnivore` (general-purpose vision encoder)
-  - `EgoVLP` (egocentric-specific pretrained encoder)
-- ✍️ Text embeddings:
-  - `GloVe 840B.300d`
-  - `BERT-base-uncased`
-- 🗃️ Segment annotations: from official validation set
-- 📦 Frame extraction: 8 evenly spaced frames per retrieved segment
+From Moments to Meanings: Egocentric VisionThis repository contains the official implementation for the paper: "From Moments to Meanings: Egocentric Temporal Localization and Answer Generation with VSLNet and Video-LLaVA on Ego4D".Authors: Arian Mohammadi, Hassine El Ghazel, Hadi Abdallah, Ali Ayoub.📖 Table of ContentsAbstractProject PipelineKey FeaturesDatasetInstallationUsageResultsCitationAcknowledgments📜 AbstractEgocentric vision focuses on understanding videos captured from a first-person perspective, posing unique challenges such as rapid camera motion and a restricted field of view. The Ego4D dataset provides a comprehensive benchmark for this domain through the Natural Language Queries (NLQ) task, which requires retrieving relevant video segments based on textual queries.In this work, we evaluate the Video Span Localizing Network (VSLNet) and its simplified variant, VSLBase, under various configurations of video and text feature extractors—including Omnivore and EgoVLP for visual features, and GloVe and BERT for language embeddings. To extend egocentric video understanding beyond temporal localization, we propose a two-stage pipeline that combines segment retrieval with Video-LLaVA for natural language answer generation, enabling both fine-grained localization and semantic reasoning. We then evaluate how well Video-LLaVA performs compared to other multimodal natural language models.🚀 Project PipelineOur core contribution is a two-stage pipeline that integrates temporal localization with generative question answering:Stage 1: Temporal Localization with VSLNetGiven a long, untrimmed egocentric video and a natural language query, we use VSLNet to predict the start and end timestamps of the most relevant segment.We experiment with different feature extractors to find the optimal combination for this task.Stage 2: Answer Generation with Video-LLaVAThe localized video segment from Stage 1 is fed into Video-LLaVA.This powerful multimodal model then generates a descriptive, human-like answer to the initial query based on the content of the clip.A visual representation of our two-stage approach.✨ Key FeaturesRobust Temporal Localization: Implementation of VSLNet and VSLBase for the Ego4D NLQ task.Modular Feature Extraction: Easily configurable backbones, supporting:Visual Features: Omnivore, EgoVLPText Features: GloVe, BERTGenerative Q&A: Integration with Video-LLaVA to move beyond simple localization and provide semantic understanding.Comprehensive Evaluation: Detailed analysis of various model and feature combinations on the Ego4D benchmark.📊 DatasetThis project uses the Ego4D dataset, specifically focusing on the Natural Language Queries (NLQ) challenge.You will need to download the dataset, including the videos and annotations, from the official website: ego4d-data.org.Place the downloaded data in a data/ directory or update the paths in the configuration files accordingly.⚙️ InstallationClone the repository:git clone https://github.com/arianmo477/EgoCentricVisionPolito.git
+cd EgoCentricVisionPolito
+Create a virtual environment (recommended):python3 -m venv venv
+source venv/bin/activate
+Install the required dependencies:pip install -r requirements.txt
+▶️ Usage1. Data PreparationEnsure the Ego4D dataset and the pre-extracted features (Omnivore, EgoVLP, etc.) are downloaded and organized according to the project's expected structure. You may need to run preprocessing scripts if provided.# Example of a preprocessing command (if applicable)
+python scripts/preprocess_data.py --config configs/data_config.yaml
+2. Training the Localization Model (VSLNet)To train the temporal localization model, run the main training script with a specific configuration file.python train.py --config configs/vslnet_omnivore_bert.yaml
+3. Running the Full Pipeline (Inference)For end-to-end inference (Localization + Answer Generation), use the inference script. This will take a video and a query as input, save the localized clip, and generate an answer.python inference.py \
+    --video_path /path/to/your/video.mp4 \
+    --query "What was I doing with the screwdriver?" \
+    --localization_model_checkpoint /path/to/vslnet_checkpoint.pth \
+    --output_dir ./results
+📈 ResultsOur experiments evaluate the performance of both stages of our pipeline: Temporal Localization and Answer Generation.Temporal Localization PerformanceWe tested various combinations of visual (EgoVLP, Omnivore) and textual (BERT, GloVe) feature extractors with VSLNet and its simpler variant, VSLBase.Key Findings:BERT vs. GloVe: Across all model configurations, using BERT embeddings consistently and significantly outperforms GloVe. This highlights the importance of contextualized word embeddings for understanding natural language queries in this task.EgoVLP vs. Omnivore: The EgoVLP visual features consistently yield better results than Omnivore, demonstrating its superior capability in capturing the nuances of egocentric video.Best Performing Model: The combination of EgoVLP + VSLBase with BERT embeddings achieves the highest scores across all metrics, making it our top-performing model for temporal localization.Below is a summary of our results:ModelEmbeddingRank1@0.3Rank1@0.5Rank3@0.5mIoUEgoVLP + VSLBaseBERT8.575.169.096.65EgoVLP + VSLBaseGloVe5.243.286.044.32EgoVLP + VSLNetBERT6.123.876.504.98EgoVLP + VSLNetGloVe4.782.975.213.71Omnivore + VSLNetBERT6.433.746.384.96Omnivore + VSLNetGloVe4.212.274.493.52Omnivore + VSLBaseBERT5.503.336.094.65Omnivore + VSLBaseGloVe3.511.813.773.05Answer Generation PerformanceFor the second stage, we evaluated the quality of answers generated by different models. We compared Video-LLaVA against several strong baselines, including variants of Google's Gemma (G1.5F, G1.5P, G2.5F, G2.5P) and GPT-4o.Key Findings:The models show varied performance across different metrics.G1.5F/P variants excel in ROUGE scores, indicating better performance in terms of recall and n-gram overlap with ground-truth answers.G2.5P achieves the highest BLEU-2 score, suggesting better precision in bigram matching.Our integrated Video-LLaVA model demonstrates a strong balance, achieving the highest BERTScore Precision, which measures semantic similarity, indicating that its generated answers are contextually very relevant.MetricVariantLLaVAG1.5FG1.5PG2.5FG2.5PGPT-4oBLEUBLEU-10.25580.26840.31150.28890.32560.2785BLEU-20.16070.16770.19920.17410.20580.1691BLEU-30.09010.10230.12140.09950.11910.0955BLEU-40.03330.04190.05240.04490.05070.0434ROUGER-10.28250.28520.34490.30970.34200.3073R-20.12800.10470.13730.10650.14420.1047R-L0.27990.28190.34390.30800.33590.3030R-Lsum0.28000.27980.34560.30620.33740.3031BERTScorePrecision0.89640.88710.89060.88590.89380.8824Recall0.88510.89230.89960.89100.89750.8952F1 Score0.89040.88930.89460.88800.89520.8883📜 CitationIf you find this work useful in your research, please consider citing our paper:@inproceedings{mohammadi2024moments,
+  title={From Moments to Meanings: Egocentric Temporal Localization and Answer Generation with VSLNet and Video-LLaVA on Ego4D},
+  author={Arian Mohammadi and Hassine El Ghazel and Hadi Abdallah and Ali Ayoub},
+  year={2024},
+  booktitle={Proceedings of ...},
+  note={GitHub: https://github.com/arianmo477/EgoCentricVisionPolito}
+}
+(Please complete the BibTeX entry once the paper is published).🙏 AcknowledgmentsThis project builds upon the fantastic work of several research teams. We would like to thank:The creators of the Ego4D dataset.The authors of VSLNet.The developers of Video-LLaVA.The teams behind Omnivore, EgoVLP, BERT, and GloVe.
