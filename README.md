@@ -53,10 +53,10 @@ Below is a summary of our results:
 
 | Model | Embedding | Rank1@0.3 | Rank1@0.5 | Rank3@0.5 | mIoU |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **EgoVLP \+ VSLBase** | **BERT** | **8.57** | **5.16** | **9.09** | **6.65** |
-| EgoVLP \+ VSLBase | GloVe | 5.24 | 3.28 | 6.04 | 4.32 |
-| **EgoVLP \+ VSLNet** | **BERT** | **6.12** | **3.87** | **6.50** | **4.98** |
-| EgoVLP \+ VSLNet | GloVe | 4.78 | 2.97 | 5.21 | 3.71 |
+| **EgoVLP \+ VSLNet** | **BERT** | **8.57** | **5.16** | **9.09** | **6.65** |
+| EgoVLP \+ VSLNet | GloVe | 5.24 | 3.28 | 6.04 | 4.32 |
+| **EgoVLP \+ VSLBase** | **BERT** | **6.12** | **3.87** | **6.50** | **4.98** |
+| EgoVLP \+ VSLBase | GloVe | 4.78 | 2.97 | 5.21 | 3.71 |
 | **Omnivore \+ VSLNet** | **BERT** | **6.43** | **3.74** | **6.38** | **4.96** |
 | Omnivore \+ VSLNet | GloVe | 4.21 | 2.27 | 4.49 | 3.52 |
 | **Omnivore \+ VSLBase** | **BERT** | **5.50** | **3.33** | **6.09** | **4.65** |
