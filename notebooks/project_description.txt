@@ -1,1 +1,82 @@
 
+
+VSLNet Training Notes for Ego4D_NLQ_EgoVLP.ipynb and Ego4D_NLQ_Omnivore.ipynb
+
+1. Predictor Setting
+---------------------
+To use the VSLNet model for training with the GloVe word embeddings instead of BERT,
+you must change the `--predictor` option from:
+    --predictor bert
+to:
+    --predictor rnn
+
+This must be updated in both:
+- Ego4D_NLQ_EgoVLP.ipynb
+- Ego4D_NLQ_Omnivore.ipynb
+
+2. Word Embeddings
+-------------------
+You must download and place the file:
+    glove.840b.300d.txt
+in the relevant directory (already done and linked in the project directory).
+
+3. Feature Linking
+-------------------
+- In Ego4D_NLQ_Omnivore.ipynb, link the Omnivore features from your Google Drive.
+- In Ego4D_NLQ_EgoVLP.ipynb, link the EgoVLP features from your Google Drive.
+
+4. Data Location and Storage
+-----------------------------
+All necessary files (EgoVLP features, Omnivore features, and GloVe embeddings)
+are already downloaded and placed inside Google Drive.
+
+Additionally, all results (including predictions and logs) are saved back to Google Drive
+in the specified output paths for traceability and convenience.
+
+5.VSLNet Modification Summary: VSLBASE Feature
+
+Overview
+This document describes the addition of the `VSLBASE` feature to the VSLNet model for the Ego4D Natural Language Queries (NLQ) task. This feature allows the model to optionally exclude the Query-Guided Highlighting (QGH) layer by setting a command-line flag when running the `main.py` script.
+
+5.1. Command-Line Option: `VSLBASE`
+- A new command-line argument `VSLBASE` was added to `options.py`.
+- Default Value: False
+- When running `main.py`, you can now pass `--VSLBASE` to enable this flag.
+- This value is stored in the `configs` object and can be accessed throughout training and evaluation.
+
+5.2. Integration in `vslnet.py`
+Affected Components:
+
+a. Initialization:
+if not configs.VSLBASE:
+    self.highlight_layer = HighLightLayer(dim=configs.dim)
+- The `highlight_layer` is only instantiated when `VSLBASE` is `False`.
+- This controls whether QGH is used during model training and inference.
+
+b. Forward Pass:
+if not self.configs.VSLBASE:
+    h_score = self.highlight_layer(features, v_mask)
+    features = features * h_score.unsqueeze(2)
+else:
+    h_score = torch.ones(features.size(0), features.size(1), device=features.device)
+- If `VSLBASE` is True, the highlighting layer is skipped, and the `h_score` is set to a tensor of ones (effectively a no-op).
+
+c. Highlight Loss:
+if not self.configs.VSLBASE:
+    return self.highlight_layer.compute_loss(scores=scores, labels=labels, mask=mask)
+else:
+    return torch.tensor(0.0, device=scores.device)
+- When `VSLBASE` is enabled, the highlight loss is replaced with a zero tensor (no contribution to total loss).
+
+5.3. Impact of `VSLBASE`
+- When False (default):
+  - Full VSLNet model is used including the QGH component.
+  - Highlight supervision contributes to the loss function.
+
+- When True:
+  - The QGH component is disabled.
+  - The model behaves more like a baseline VSLNet without highlight supervision.
+  - The `highlight_layer` and its corresponding loss are skipped entirely.
+
+
+
