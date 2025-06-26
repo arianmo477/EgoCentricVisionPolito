@@ -36,19 +36,6 @@ This project uses the **Ego4D** dataset, specifically focusing on the Natural La
 You will need to download the dataset, including the videos and annotations, from the official website: [ego4d-data.org](https://ego4d-data.org/).  
 Place the downloaded data in a data/ directory or update the paths in the configuration files accordingly.
 
-## **⚙️ Installation**
-
-1. **Clone the repository:**  
-   git clone https://github.com/arianmo477/EgoCentricVisionPolito.git  
-   cd EgoCentricVisionPolito
-
-2. **Create a virtual environment (recommended):**  
-   python3 \-m venv venv  
-   source venv/bin/activate
-
-3. **Install the required dependencies:**  
-   pip install \-r requirements.txt
-
 ## **📈 Results**
 
 Our experiments evaluate the performance of both stages of our pipeline: Temporal Localization and Answer Generation.
