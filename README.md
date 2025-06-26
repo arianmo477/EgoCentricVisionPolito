@@ -1,7 +1,7 @@
 # **From Moments to Meanings: Egocentric Vision**
 
 This repository contains the official implementation for the paper: **"From Moments to Meanings: Egocentric Temporal Localization and Answer Generation with VSLNet and Video-LLaVA on Ego4D"**.  
-**Authors:** [Arian Mohammadi](https://github.com/arianmo477), [Hassine El Ghazel](https://github.com/HassineEG), Hadi Abdallah, Ali Ayoub.
+**Authors:** [Arian Mohammadi](https://github.com/arianmo477), [Hassine El Ghazel](https://github.com/hassineElghazel), Hadi Abdallah, Ali Ayoub.
 
 ## **📜 Abstract**
 
