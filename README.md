@@ -104,6 +104,6 @@ If you find this work useful in your research, please consider citing our paper:
 This project builds upon the fantastic work of several research teams. We would like to thank:
 
 * The creators of the [Ego4D dataset](https://ego4d-data.org/).  
-* The authors of [VSLNet](https://github.com/microsoft/VSLNet).  
+* The authors of [VSLNet] (https://github.com/26hzhang/VSLNet).  
 * The developers of [Video-LLaVA](https://github.com/PKU-YuanGroup/Video-LLaVA).  
 * The teams behind [Omnivore](https://github.com/facebookresearch/omnivore), [EgoVLP](https://github.com/showlab/EgoVLP), [BERT](https://huggingface.co/docs/transformers/model_doc/bert), and [GloVe](https://nlp.stanford.edu/projects/glove/).
