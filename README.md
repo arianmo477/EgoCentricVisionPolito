@@ -16,7 +16,7 @@ Our core contribution is a two-stage pipeline that integrates temporal localizat
    * Given a long, untrimmed egocentric video and a natural language query, we use VSLNet to predict the start and end timestamps of the most relevant segment.  
    * We experiment with different feature extractors to find the optimal combination for this task.  
 2. **Stage 2: Answer Generation with Video-LLaVA**  
-   * The localized video segment from Stage 1 is fed into Video-LLaVA.  
+   * The best 200 localized video segments from Stage 1 are fed into Video-LLaVA.  
    * This powerful multimodal model then generates a descriptive, human-like answer to the initial query based on the content of the clip.
    * Comparaison of Video-LLaVA with other commerical models
 A visual representation of our two-stage approach.
